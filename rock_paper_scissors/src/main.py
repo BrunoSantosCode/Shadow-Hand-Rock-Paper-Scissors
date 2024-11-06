@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-from turtle import pos
 import rospy
 from termcolor import colored
 from sr_robot_commander.sr_hand_commander import SrHandCommander
@@ -53,15 +52,19 @@ def set_hand_pose(pose: str, wait = True):
     global hand_commander
 
     if pose == 'rock':
-        hand_commander.move_to_joint_value_target_unsafe(joint_states=rock_hand_prev, time=1.0, wait=wait, angle_degrees=False)
+        hand_joints = hand_commander.get_joints_position()
+        sum_ff = (hand_joints['rh_FFJ2']+hand_joints['rh_FFJ3'])*180/3.1415
+        sum_mf = (hand_joints['rh_MFJ2']+hand_joints['rh_MFJ3'])*180/3.1415
+        if ((sum_ff < 120) or (sum_mf < 120)): 
+            hand_commander.move_to_joint_value_target_unsafe(joint_states=rock_hand_prev, time=1.0, wait=wait, angle_degrees=False)
         hand_commander.move_to_joint_value_target_unsafe(joint_states=rock_hand, time=1.0, wait=wait, angle_degrees=False)
-        print('\n' + colored('Rock!', 'green') + '\n') 
+        print('\n' + colored('Rock!', 'green') + '\n')
     elif pose == 'paper':
         hand_commander.move_to_joint_value_target_unsafe(joint_states=paper_hand, time=1.0, wait=wait, angle_degrees=False)
-        print('\n' + colored('Paper!', 'green') + '\n') 
+        print('\n' + colored('Paper!', 'green') + '\n')
     elif pose == 'scissors':
         hand_commander.move_to_joint_value_target_unsafe(joint_states=scissors_hand, time=1.0, wait=wait, angle_degrees=False)
-        print('\n' + colored('Scissors!', 'green') + '\n') 
+        print('\n' + colored('Scissors!', 'green') + '\n')
     else:
         print('\n' + colored('ERROR: "' + pose + '" hand pose is not defined!', 'red') + '\n')
 
