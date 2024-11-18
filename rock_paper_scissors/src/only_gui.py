@@ -1,9 +1,13 @@
+import os
 import cv2
 import time
 import random
 import numpy as np
 import mediapipe as mp
 
+# Images folder path
+IMAGES_PATH = os.path.dirname(os.path.realpath(__file__))
+IMAGES_PATH = IMAGES_PATH[:-3] + 'images/'
 
 def countFingersUp (mp_hands, result):
     '''
@@ -116,7 +120,7 @@ def main():
 
     while True:
         # Get background and webcam image
-        background = cv2.imread("rock_paper_scissors/images/background.png")
+        background = cv2.imread(IMAGES_PATH+"background.png")
         success, raw_img = cap.read()
         
         # Resize webcam image
@@ -166,7 +170,7 @@ def main():
                 textX = int(962 - textSize/2)
                 cv2.putText(background, 'Too late!', (textX,625), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
             # Shadow Move
-            shadowMoveImg = cv2.imread(f'rock_paper_scissors/images/{shadowMove}.png', cv2.IMREAD_UNCHANGED)
+            shadowMoveImg = cv2.imread(IMAGES_PATH+f'{shadowMove}.png', cv2.IMREAD_UNCHANGED)
             background = overlay_image(background, shadowMoveImg, (318, 377))
             textSize = cv2.getTextSize(shadowMove, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0][0]
             textX = int(318 - textSize/2)

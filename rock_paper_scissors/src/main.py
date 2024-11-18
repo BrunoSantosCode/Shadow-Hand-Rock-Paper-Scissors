@@ -43,6 +43,9 @@ scissors_hand = {'rh_FFJ1': 0.000, 'rh_FFJ2': 0.000, 'rh_FFJ3': 0.000, 'rh_FFJ4'
                 'rh_THJ1': 0.730, 'rh_THJ2': 0.698, 'rh_THJ3': 0.000, 'rh_THJ4': 1.221, 'rh_THJ5': 0.050,
                 'rh_WRJ1': 0.000, 'rh_WRJ2': 0.000}
 
+# Default Wrist
+wrist_default = {'rh_WRJ1': 0.000, 'rh_WRJ2': 0.000}
+
 # Wrist Up
 wrist_up = {'rh_WRJ1': 0.000, 'rh_WRJ2': 0.174}
 
@@ -83,7 +86,9 @@ def set_wrist_pose(pose: str, wait = True):
     """
     global hand_commander
 
-    if pose == 'up':
+    if pose == 'default':
+        hand_commander.move_to_joint_value_target_unsafe(joint_states=wrist_default, time=1.0, wait=wait, angle_degrees=False)
+    elif pose == 'up':
         hand_commander.move_to_joint_value_target_unsafe(joint_states=wrist_up, time=1.0, wait=wait, angle_degrees=False)
     elif pose == 'down':
         hand_commander.move_to_joint_value_target_unsafe(joint_states=wrist_down, time=1.0, wait=wait, angle_degrees=False)
@@ -101,6 +106,7 @@ def give_me_a(object: str, wait = True):
     set_wrist_pose('up', wait=wait)
     set_wrist_pose('down', wait=wait)
     set_wrist_pose('up', wait=wait)
+    set_wrist_pose('default', wait=wait)
     set_hand_pose(pose = object, wait=wait)
 
 
