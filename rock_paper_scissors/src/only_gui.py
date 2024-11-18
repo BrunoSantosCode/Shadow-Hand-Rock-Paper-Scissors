@@ -70,7 +70,7 @@ def overlay_image(background, overlay, center_position):
     # Unpack center position coordinates
     center_x, center_y = center_position
     # Resize the overlay image to the specified size
-    overlay = cv2.resize(overlay, (150,150), interpolation=cv2.INTER_AREA)
+    overlay = cv2.resize(overlay, (275,367), interpolation=cv2.INTER_AREA)
     # Get dimensions of the overlay image
     overlay_height, overlay_width = overlay.shape[:2]
     # Calculate the top-left corner of the overlay based on the center position
@@ -136,7 +136,7 @@ def main():
             for hand_landmarks in result.multi_hand_landmarks:
                 mp_drawing.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
         
-        # Game Start
+        # Start Game
         if startGame:
             if not stateResult:
                 timer = time.time() - initialTime + 1
