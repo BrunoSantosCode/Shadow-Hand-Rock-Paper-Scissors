@@ -1,0 +1,3 @@
+<launch>
+    <node name="real_robot" pkg="rock_paper_scissors" type="real_robot.py" output="screen" />
+</launch>

@@ -1,3 +1,0 @@
-<launch>
-    <node name="main" pkg="rock_paper_scissors" type="main.py" output="screen" />
-</launch>

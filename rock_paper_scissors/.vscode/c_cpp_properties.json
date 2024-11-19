@@ -1,0 +1,49 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${workspaceFolder}/.vscode/browse.vc.db",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/user/projects/shadow_robot/base/devel/include/**",
+        "/home/user/projects/shadow_robot/base_deps/devel/include/**",
+        "/opt/ros/noetic/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_interface/sr_hand_kinematics/hand_kinematics/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_interface/sr_hand_kinematics/kdl_coupling/include/**",
+        "/home/user/projects/shadow_robot/base/src/rock_paper_scissors/include/**",
+        "/home/user/projects/shadow_robot/base/src/ros_control_robot/include/**",
+        "/home/user/projects/shadow_robot/base_deps/src/ros_ethercat_eml/include/**",
+        "/home/user/projects/shadow_robot/base/src/ros_ethercat/ros_ethercat_hardware/include/**",
+        "/home/user/projects/shadow_robot/base/src/ros_ethercat/ros_ethercat_model/include/**",
+        "/home/user/projects/shadow_robot/base_deps/src/sr_utils/sr_dynamic_time_warping/include/**",
+        "/home/user/projects/shadow_robot/base/src/shadow_robot_ethercat/sr_edc_ethercat_drivers/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_interface/sr_error_reporter/include/**",
+        "/home/user/projects/shadow_robot/base/src/shadow_robot_ethercat/sr_external_dependencies/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_core/sr_gazebo_sim/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_core/sr_hand/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_core/sr_hardware_interface/include/**",
+        "/home/user/projects/shadow_robot/base_deps/src/sr_utils/sr_interpolation/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_core/sr_mechanism_controllers/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_core/sr_mechanism_model/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_tools/sr_movements/include/**",
+        "/home/user/projects/shadow_robot/base/src/shadow_robot_ethercat/sr_robot_lib/include/**",
+        "/home/user/projects/shadow_robot/base/src/shadow_robot_ethercat/sr_tactile_sensor_controller/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_core/sr_tactile_sensors/include/**",
+        "/home/user/projects/shadow_robot/base/src/common_resources/sr_tests_template/include/**",
+        "/home/user/projects/shadow_robot/base/src/sr_core/sr_utilities/include/**",
+        "/home/user/projects/shadow_robot/base/src/common_resources/sr_utilities_common/include/**",
+        "/home/user/projects/shadow_robot/base/src/Universal_Robots_ROS_Driver/ur_calibration/include/**",
+        "/home/user/projects/shadow_robot/base/src/universal_robot/ur_kinematics/include/**",
+        "/home/user/projects/shadow_robot/base/src/Universal_Robots_ROS_Driver/ur_robot_driver/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}
