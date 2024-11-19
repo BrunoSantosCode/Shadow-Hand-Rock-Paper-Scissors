@@ -16,10 +16,12 @@ def countFingersUp (mp_hands, result):
         results: The output of the mediapipe hands landmarks detection
     Returns:
         fingersUp: An array corresponding to fingers position [0-down or 1-up] for each finger by order: ff, mf, rf, lf 
+        thumbsUP: Boolean checking Thumbs Up hand position
     '''
 
     # Return array
     fingersUp = [0, 0, 0, 0]
+    thumbsUP = False
 
     # Get hand info
     hand_label = result.multi_handedness[0].classification[0].label
@@ -33,7 +35,12 @@ def countFingersUp (mp_hands, result):
             fingersUp[fingersCount] = 1
         fingersCount += 1
 
-    return fingersUp
+    # Check Thumbs Up
+    if hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP].y:
+        if hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x < hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_MCP].x:
+            thumbsUP = True
+
+    return fingersUp, thumbsUP
 
 
 def findGesture (fingersUp):
@@ -117,6 +124,7 @@ def main():
     shadowMove = None
     userScore = 0
     shadowScore = 0
+    thumbsUp = False
 
     while True:
         # Get background and webcam image
@@ -130,6 +138,8 @@ def main():
         # Mediapipe
         imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         result = detect_hands.process(imgRGB)
+        if result.multi_hand_landmarks:
+            fingersUp, thumbsUp = countFingersUp(mp_hands, result)
 
         # Display Mediapipe Hands
         if result.multi_hand_landmarks:
@@ -144,7 +154,6 @@ def main():
                 # Decision time
                 if timer >= 3:
                     if result.multi_hand_landmarks:
-                        fingersUp = countFingersUp(mp_hands, result)
                         userMove = findGesture(fingersUp)
                     shadowMove = random.choice(["Rock", "Paper", "Scissors"])
                     stateResult = True
@@ -197,13 +206,14 @@ def main():
         if key == ord('q'):
             cv2.destroyAllWindows()
             return
-        elif key == ord('\r') or key == ord('\n'):
+        elif (key == ord('\r') or key == ord('\n') or thumbsUp) and not startGame:
             timer = 0
             initialTime = time.time()
             startGame = True
             stateResult = False
             shadowMove = None
             userMove = None
+            thumbsUp = False
 
 
 if __name__ == "__main__":
