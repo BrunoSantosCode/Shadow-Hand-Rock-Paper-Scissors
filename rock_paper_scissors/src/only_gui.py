@@ -4,59 +4,30 @@ import time
 import random
 import numpy as np
 import mediapipe as mp
+from mediapipe.framework.formats import landmark_pb2
 
 # Images folder path
 IMAGES_PATH = os.path.dirname(os.path.realpath(__file__))
 IMAGES_PATH = IMAGES_PATH[:-3] + 'images/'
 
-def countFingersUp (mp_hands, result):
+# MediaPipe Gesture Recognition model path
+MODEL_PATH = os.path.dirname(os.path.realpath(__file__))
+MODEL_PATH = MODEL_PATH[:-3] + 'models/gesture_recognizer.task'
+
+def getUserMove(mp_result):
     '''
-    This function will count the number of fingers up
+    This function will return the user move from the MediaPipe results
     Args:
-        results: The output of the mediapipe hands landmarks detection
-    Returns:
-        fingersUp: An array corresponding to fingers position [0-down or 1-up] for each finger by order: ff, mf, rf, lf 
-        thumbsUP: Boolean checking Thumbs Up hand position
-    '''
-
-    # Return array
-    fingersUp = [0, 0, 0, 0]
-    thumbsUP = False
-
-    # Get hand info
-    hand_label = result.multi_handedness[0].classification[0].label
-    hand_landmarks = result.multi_hand_landmarks[0]
-
-    # Check fingers position
-    fingerTipsIds = [mp_hands.HandLandmark.INDEX_FINGER_TIP, mp_hands.HandLandmark.MIDDLE_FINGER_TIP, mp_hands.HandLandmark.RING_FINGER_TIP, mp_hands.HandLandmark.PINKY_TIP]
-    fingersCount = 0
-    for tipIndex in fingerTipsIds:
-        if (hand_landmarks.landmark[tipIndex].y < hand_landmarks.landmark[tipIndex-2].y):
-            fingersUp[fingersCount] = 1
-        fingersCount += 1
-
-    # Check Thumbs Up
-    if hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_TIP].y < hand_landmarks.landmark[mp_hands.HandLandmark.THUMB_IP].y:
-        if hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_TIP].x < hand_landmarks.landmark[mp_hands.HandLandmark.INDEX_FINGER_MCP].x:
-            thumbsUP = True
-
-    return fingersUp, thumbsUP
-
-
-def findGesture (fingersUp):
-    '''
-    This function will recognize the hand gesture
-    Args:
-        fingersUp: An array corresponding to fingers position [0-down or 1-up] for each finger by order: thumb, ff, mf, rf, lf 
+        mp_result: Hand gesture recognition from MediaPipe
     Returns:
         gesture: String with 'Rock', 'Paper', 'Scissors' or None
     '''
     gesture = None
-    if fingersUp == [0,0,0,0]:
+    if mp_result == 'Closed_Fist':
         gesture = 'Rock'
-    elif fingersUp == [1,1,1,1]:
+    elif mp_result == 'Open_Palm':
         gesture = 'Paper'
-    elif fingersUp == [1,1,0,0]:
+    elif mp_result == 'Victory':
         gesture = 'Scissors'
 
     return gesture
@@ -102,7 +73,6 @@ def overlay_image(background, overlay, center_position):
     return background
 
 
-
 def main():
 
     # Init Webcam
@@ -111,15 +81,24 @@ def main():
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     # Init Mediapipe
+    BaseOptions = mp.tasks.BaseOptions
+    GestureRecognizer = mp.tasks.vision.GestureRecognizer
+    GestureRecognizerOptions = mp.tasks.vision.GestureRecognizerOptions
+    VisionRunningMode = mp.tasks.vision.RunningMode
     mp_hands = mp.solutions.hands
-    detect_hands = mp_hands.Hands(static_image_mode=False, max_num_hands=1, model_complexity=0, min_detection_confidence=0.75)
     mp_drawing = mp.solutions.drawing_utils
+    options = GestureRecognizerOptions(
+                base_options=BaseOptions(model_asset_path=MODEL_PATH),
+                running_mode=VisionRunningMode.IMAGE,
+                num_hands=1)
+    recognizer = GestureRecognizer.create_from_options(options)
     
     # Game vars
     timer = 0
     initialTime = 0
     startGame = False
     stateResult = False
+    userGesture = None
     userMove = None
     shadowMove = None
     userScore = 0
@@ -129,22 +108,28 @@ def main():
     while True:
         # Get background and webcam image
         background = cv2.imread(IMAGES_PATH+"background.png")
-        success, raw_img = cap.read()
+        _, raw_img = cap.read()
         
-        # Resize webcam image
+        # Image Preprocessing
         img = cv2.resize(raw_img, (0,0), fx=0.885, fy=0.885)
         img = img[:, 138:503]
+        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
         # Mediapipe
-        imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        result = detect_hands.process(imgRGB)
-        if result.multi_hand_landmarks:
-            fingersUp, thumbsUp = countFingersUp(mp_hands, result)
+        mp_img = mp.Image(image_format=mp.ImageFormat.SRGB, data=imgRGB.astype(np.uint8))
+        recognition_result = recognizer.recognize(mp_img)
+        if recognition_result.gestures:
+            userGesture = recognition_result.gestures[0][0].category_name
+            thumbsUp = (userGesture == 'Thumb_Up')
 
         # Display Mediapipe Hands
-        if result.multi_hand_landmarks:
-            for hand_landmarks in result.multi_hand_landmarks:
-                mp_drawing.draw_landmarks(img, hand_landmarks, mp_hands.HAND_CONNECTIONS)
+        if recognition_result.hand_landmarks:
+             for hand_landmarks in recognition_result.hand_landmarks:
+                hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
+                hand_landmarks_proto.landmark.extend([
+                    landmark_pb2.NormalizedLandmark(x=landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks
+                ])
+                mp_drawing.draw_landmarks(img, hand_landmarks_proto, mp_hands.HAND_CONNECTIONS)
         
         # Start Game
         if startGame:
@@ -153,8 +138,8 @@ def main():
                 cv2.putText(background, str(int(timer)), (607,400), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255), 5)
                 # Decision time
                 if timer >= 3:
-                    if result.multi_hand_landmarks:
-                        userMove = findGesture(fingersUp)
+                    if recognition_result.gestures:
+                        userMove = getUserMove(userGesture)
                     shadowMove = random.choice(["Rock", "Paper", "Scissors"])
                     stateResult = True
                     startGame = False
@@ -211,8 +196,9 @@ def main():
             initialTime = time.time()
             startGame = True
             stateResult = False
-            shadowMove = None
+            userGesture = None
             userMove = None
+            shadowMove = None
             thumbsUp = False
 
 
