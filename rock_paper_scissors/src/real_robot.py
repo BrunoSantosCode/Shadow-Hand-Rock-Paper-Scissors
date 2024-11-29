@@ -143,7 +143,7 @@ def getUserMove(mp_result):
     Returns:
         gesture: String with 'Rock', 'Paper', 'Scissors' or None
     '''
-    gesture = None
+    gesture = 'None'
     if mp_result == 'Closed_Fist':
         gesture = 'Rock'
     elif mp_result == 'Open_Palm':
@@ -286,8 +286,8 @@ def main():
                         shadowScore += 1
             elif flags['wrist3'].is_set():
                 cv2.putText(background, '3', (607,400), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255), 5)
-                if recognition_result.gestures:
-                        userMove = getUserMove(userGesture)
+                if recognition_result.gestures and not userMove:
+                    userMove = getUserMove(userGesture)
                 stateResult = True
             elif flags['wrist2'].is_set():
                 cv2.putText(background, '2', (607,400), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255), 5)
@@ -301,7 +301,7 @@ def main():
             # Timer
             cv2.putText(background, '3', (607,400), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255), 5)
             # User Move
-            if userMove is not None:
+            if userMove != 'None':
                 textSize = cv2.getTextSize(userMove, cv2.FONT_HERSHEY_SIMPLEX, 1, 2)[0][0]
                 textX = int(962 - textSize/2)
                 cv2.putText(background, userMove, (textX,625), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), 2)
@@ -334,9 +334,11 @@ def main():
         # Display
         cv2.imshow("RockPaperScissors.exe", background)
         key = cv2.waitKey(1)
+        # Exit
         if key == ord('q'):
             cv2.destroyAllWindows()
             return
+        # New game
         elif (key == ord('\r') or key == ord('\n') or thumbsUp) and flags['complete'].is_set():
             startGame = True
             stateResult = False
