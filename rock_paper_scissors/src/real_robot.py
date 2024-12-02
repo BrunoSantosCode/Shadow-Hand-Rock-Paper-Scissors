@@ -282,7 +282,7 @@ def main():
                 if userMove!=shadowMove:
                     if (userMove=='Rock' and shadowMove=='Scissors') or (userMove=='Paper' and shadowMove=='Rock') or (userMove=='Scissors' and shadowMove=='Paper'):
                         userScore += 1
-                    elif (shadowMove=='Rock' and userMove=='Scissors') or (shadowMove=='Paper' and userMove=='Rock') or (shadowMove=='Scissors' and userMove=='Paper') or (userMove==None):
+                    elif (shadowMove=='Rock' and userMove=='Scissors') or (shadowMove=='Paper' and userMove=='Rock') or (shadowMove=='Scissors' and userMove=='Paper') or (userMove==None) or (userMove=='None'):
                         shadowScore += 1
             elif flags['wrist3'].is_set():
                 cv2.putText(background, '3', (607,400), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255), 5)
