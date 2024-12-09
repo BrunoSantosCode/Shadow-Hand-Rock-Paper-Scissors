@@ -329,7 +329,8 @@ def main():
             cv2.putText(background, f"{userScore:04d}", (642+offset,286-offset), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,0,255), 2)
 
         # Add webcam image to the background
-        background[165:590, 780:1145] = img
+        flippedImg = cv2.flip(img, 1)
+        background[165:590, 780:1145] = flippedImg
 
         # Display
         cv2.imshow("RockPaperScissors.exe", background)
